@@ -1,10 +1,12 @@
 package fiberext
 
 import (
+	"context"
+
 	"github.com/gofiber/fiber/v2"
 )
 
-func RunHTTPServer(config *ServerConfig) error {
+func RunHTTPServer(ctx context.Context, config *ServerConfig) {
 	server := fiber.New(config.Convert())
 
 	for _, middleware := range config.Middlewares() {
@@ -15,5 +17,15 @@ func RunHTTPServer(config *ServerConfig) error {
 		server.Add(endpoint.Method, endpoint.Path, endpoint.Handler)
 	}
 
-	return server.Listen(config.URL())
+	go func() {
+		if err := server.Listen(config.URL()); err != nil {
+			panic(err)
+		}
+
+		<-ctx.Done()
+
+		if err := server.Shutdown(); err != nil {
+			panic(err)
+		}
+	}()
 }
