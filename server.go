@@ -6,6 +6,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Run builds a fiber server from cfg, registers middlewares, resources and
+// controllers, then starts listening in a background goroutine. Cancelling ctx
+// triggers graceful shutdown. Returns the underlying *fiber.App.
 func Run(ctx context.Context, config *Config) Server {
 	if ctx == nil {
 		ctx = context.Background()

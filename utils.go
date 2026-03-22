@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// FromParams parses URL parameters into T using the "params" struct tag.
 func FromParams[T any](ctx Context) (T, error) {
 	var obj T
 	err := ctx.ParamsParser(&obj)
@@ -15,6 +16,7 @@ func FromParams[T any](ctx Context) (T, error) {
 	return obj, nil
 }
 
+// FromBody decodes the JSON request body into T.
 func FromBody[T any](ctx Context) (T, error) {
 	var obj T
 
@@ -31,6 +33,7 @@ func FromBody[T any](ctx Context) (T, error) {
 	return obj, nil
 }
 
+// FromQuery parses query string parameters into T using the "query" struct tag.
 func FromQuery[T any](ctx Context) (T, error) {
 	var obj T
 	err := ctx.QueryParser(&obj)
@@ -42,14 +45,17 @@ func FromQuery[T any](ctx Context) (T, error) {
 	return obj, nil
 }
 
+// GetParam returns the URL parameter for key, falling back to def if absent.
 func GetParam(ctx Context, key string, def ...string) string {
 	return ctx.Params(key, def...)
 }
 
+// GetQueryArg returns the query argument for key, falling back to def if absent.
 func GetQueryArg(ctx Context, key string, def ...string) string {
 	return ctx.Query(key, def...)
 }
 
+// Respond writes status and optionally serializes obj as JSON.
 func Respond(ctx Context, code int, obj ...any) error {
 	ctx.Status(code)
 
@@ -60,6 +66,7 @@ func Respond(ctx Context, code int, obj ...any) error {
 	return nil
 }
 
+// RespondError writes status, optionally serializes obj, and returns a fiber.Error.
 func RespondError(ctx Context, code int, obj ...any) error {
 	ctx.Status(code)
 	if len(obj) > 0 {
