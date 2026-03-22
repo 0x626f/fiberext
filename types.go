@@ -20,8 +20,14 @@ func NewController(path string) *Controller {
 	}
 }
 
-func (controller *Controller) AddResource(resource *Resource) {
+func (controller *Controller) AddResource(resource *Resource) *Controller {
 	controller.Resources = append(controller.Resources, resource)
+	return controller
+}
+
+func (controller *Controller) AddNewResource(method, path string, handler Handler) *Controller {
+	controller.AddResource(NewResource(method, path, handler))
+	return controller
 }
 
 type Resource struct {
