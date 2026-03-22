@@ -1,97 +1,303 @@
 package fiberext
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
-type ServerConfig struct {
-	Host string `env:"HOST" default:"localhost"`
-	Port int    `env:"PORT" default:"8080"`
+type Config struct {
+	fiber.Config
 
-	Prefork         bool          `env:"PREFORK" default:"false"`
-	BodyLimit       int           `env:"BODY_LIMIT" default:"4194304"`
-	Concurrency     int           `env:"CONCURRENCY" default:"262144"`
-	ReadTimeout     time.Duration `env:"READ_TIMEOUT" default:"0"`
-	WriteTimeout    time.Duration `env:"WRITE_TIMEOUT" default:"0"`
-	IdleTimeout     time.Duration `env:"IDLE_TIMEOUT" default:"0"`
-	ReadBufferSize  int           `env:"READ_BUFFER_SIZE" default:"4096"`
-	WriteBufferSize int           `env:"WRITE_BUFFER_SIZE" default:"4096"`
+	Host string `json:"host"`
+	Port int    `json:"port"`
 
-	Bootstrap *BootstrapConfig `env:"-"`
+	TLS            bool `json:"useTls"`
+	MutualTLS      bool
+	CertFile       string
+	KeyFile        string
+	ClientCertFile string
+	Certificate    *tls.Certificate
+	ClientCerts    *x509.CertPool
+
+	Controllers []*Controller
+	Resources   []*Resource
+	Middlewares []Handler
 }
 
-func (config *ServerConfig) Convert() fiber.Config {
-	fiberConfig := fiber.Config{
-		DisableStartupMessage: true,
-		Prefork:               config.Prefork,
-		BodyLimit:             config.BodyLimit,
-		Concurrency:           config.Concurrency,
-		ReadTimeout:           config.ReadTimeout,
-		WriteTimeout:          config.WriteTimeout,
-		IdleTimeout:           config.IdleTimeout,
-		ReadBufferSize:        config.ReadBufferSize,
-		WriteBufferSize:       config.WriteBufferSize,
-	}
-
-	if config.Bootstrap != nil {
-		fiberConfig.ErrorHandler = config.Bootstrap.ErrorHandler
-	}
-
-	return fiberConfig
+func NewConfig() *Config {
+	return &Config{}
 }
 
-func (config *ServerConfig) URL() string {
-	return fmt.Sprintf("%v:%v", config.Host, config.Port)
+func (config *Config) WithController(controller *Controller) *Config {
+	config.Controllers = append(config.Controllers, controller)
+	return config
 }
 
-func (config *ServerConfig) Middlewares() []fiber.Handler {
-	if config.Bootstrap == nil {
-		return nil
-	}
-
-	return config.Bootstrap.Middlewares
+func (config *Config) WithResource(resource *Resource) *Config {
+	config.Resources = append(config.Resources, resource)
+	return config
 }
 
-func (config *ServerConfig) Endpoints() []*EndpointConfig {
-	if config.Bootstrap == nil {
-		return nil
-	}
-
-	return config.Bootstrap.Endpoints
+func (config *Config) WithMiddleware(middleware Handler) *Config {
+	config.Middlewares = append(config.Middlewares, middleware)
+	return config
 }
 
-func (config *ServerConfig) validateBootstrapConfig() {
-	if config.Bootstrap == nil {
-		config.Bootstrap = &BootstrapConfig{}
-	}
+func (config *Config) WithTLS(v bool) *Config {
+	config.TLS = v
+	return config
 }
 
-func (config *ServerConfig) AddEndpoint(endpoint *EndpointConfig) {
-	config.validateBootstrapConfig()
-	config.Bootstrap.Endpoints = append(config.Bootstrap.Endpoints, endpoint)
+func (config *Config) WithMutualTLS(v bool) *Config {
+	config.MutualTLS = v
+	return config
 }
 
-func (config *ServerConfig) SetErrorHandler(handler fiber.ErrorHandler) {
-	config.validateBootstrapConfig()
-	config.Bootstrap.ErrorHandler = handler
+func (config *Config) WithCertFile(v string) *Config {
+	config.CertFile = v
+	return config
 }
 
-func (config *ServerConfig) AddMiddleware(handler fiber.Handler) {
-	config.validateBootstrapConfig()
-	config.Bootstrap.Middlewares = append(config.Bootstrap.Middlewares, handler)
+func (config *Config) WithKeyFile(v string) *Config {
+	config.KeyFile = v
+	return config
 }
 
-type EndpointConfig struct {
-	Method  string
-	Path    string
-	Handler fiber.Handler
+func (config *Config) WithClientCertFile(v string) *Config {
+	config.ClientCertFile = v
+	return config
 }
 
-type BootstrapConfig struct {
-	Endpoints    []*EndpointConfig
-	ErrorHandler fiber.ErrorHandler
-	Middlewares  []fiber.Handler
+func (config *Config) WithCertificate(v tls.Certificate) *Config {
+	config.Certificate = &v
+	return config
+}
+
+func (config *Config) WithClientCerts(v *x509.CertPool) *Config {
+	config.ClientCerts = v
+	return config
+}
+
+func (config *Config) WithHost(v string) *Config {
+	config.Host = v
+	return config
+}
+
+func (config *Config) WithPort(v int) *Config {
+	config.Port = v
+	return config
+}
+
+func (config *Config) WithPrefork(v bool) *Config {
+	config.Prefork = v
+	return config
+}
+
+func (config *Config) WithServerHeader(v string) *Config {
+	config.ServerHeader = v
+	return config
+}
+
+func (config *Config) WithStrictRouting(v bool) *Config {
+	config.StrictRouting = v
+	return config
+}
+
+func (config *Config) WithCaseSensitive(v bool) *Config {
+	config.CaseSensitive = v
+	return config
+}
+
+func (config *Config) WithImmutable(v bool) *Config {
+	config.Immutable = v
+	return config
+}
+
+func (config *Config) WithUnescapePath(v bool) *Config {
+	config.UnescapePath = v
+	return config
+}
+
+func (config *Config) WithETag(v bool) *Config {
+	config.ETag = v
+	return config
+}
+
+func (config *Config) WithBodyLimit(v int) *Config {
+	config.BodyLimit = v
+	return config
+}
+
+func (config *Config) WithConcurrency(v int) *Config {
+	config.Concurrency = v
+	return config
+}
+
+func (config *Config) WithViews(v fiber.Views) *Config {
+	config.Views = v
+	return config
+}
+
+func (config *Config) WithViewsLayout(v string) *Config {
+	config.ViewsLayout = v
+	return config
+}
+
+func (config *Config) WithPassLocalsToViews(v bool) *Config {
+	config.PassLocalsToViews = v
+	return config
+}
+
+func (config *Config) WithReadTimeout(v time.Duration) *Config {
+	config.ReadTimeout = v
+	return config
+}
+
+func (config *Config) WithWriteTimeout(v time.Duration) *Config {
+	config.WriteTimeout = v
+	return config
+}
+
+func (config *Config) WithIdleTimeout(v time.Duration) *Config {
+	config.IdleTimeout = v
+	return config
+}
+
+func (config *Config) WithReadBufferSize(v int) *Config {
+	config.ReadBufferSize = v
+	return config
+}
+
+func (config *Config) WithWriteBufferSize(v int) *Config {
+	config.WriteBufferSize = v
+	return config
+}
+
+func (config *Config) WithCompressedFileSuffix(v string) *Config {
+	config.CompressedFileSuffix = v
+	return config
+}
+
+func (config *Config) WithProxyHeader(v string) *Config {
+	config.ProxyHeader = v
+	return config
+}
+
+func (config *Config) WithGETOnly(v bool) *Config {
+	config.GETOnly = v
+	return config
+}
+
+func (config *Config) WithErrorHandler(v ErrorHandler) *Config {
+	config.ErrorHandler = v
+	return config
+}
+
+func (config *Config) WithDisableKeepalive(v bool) *Config {
+	config.DisableKeepalive = v
+	return config
+}
+
+func (config *Config) WithDisableDefaultDate(v bool) *Config {
+	config.DisableDefaultDate = v
+	return config
+}
+
+func (config *Config) WithDisableDefaultContentType(v bool) *Config {
+	config.DisableDefaultContentType = v
+	return config
+}
+
+func (config *Config) WithDisableHeaderNormalizing(v bool) *Config {
+	config.DisableHeaderNormalizing = v
+	return config
+}
+
+func (config *Config) WithDisableStartupMessage(v bool) *Config {
+	config.DisableStartupMessage = v
+	return config
+}
+
+func (config *Config) WithAppName(v string) *Config {
+	config.AppName = v
+	return config
+}
+
+func (config *Config) WithStreamRequestBody(v bool) *Config {
+	config.StreamRequestBody = v
+	return config
+}
+
+func (config *Config) WithDisablePreParseMultipartForm(v bool) *Config {
+	config.DisablePreParseMultipartForm = v
+	return config
+}
+
+func (config *Config) WithReduceMemoryUsage(v bool) *Config {
+	config.ReduceMemoryUsage = v
+	return config
+}
+
+func (config *Config) WithJSONEncoder(v utils.JSONMarshal) *Config {
+	config.JSONEncoder = v
+	return config
+}
+
+func (config *Config) WithJSONDecoder(v utils.JSONUnmarshal) *Config {
+	config.JSONDecoder = v
+	return config
+}
+
+func (config *Config) WithXMLEncoder(v utils.XMLMarshal) *Config {
+	config.XMLEncoder = v
+	return config
+}
+
+func (config *Config) WithNetwork(v string) *Config {
+	config.Network = v
+	return config
+}
+
+func (config *Config) WithEnableTrustedProxyCheck(v bool) *Config {
+	config.EnableTrustedProxyCheck = v
+	return config
+}
+
+func (config *Config) WithTrustedProxies(v []string) *Config {
+	config.TrustedProxies = v
+	return config
+}
+
+func (config *Config) WithEnableIPValidation(v bool) *Config {
+	config.EnableIPValidation = v
+	return config
+}
+
+func (config *Config) WithEnablePrintRoutes(v bool) *Config {
+	config.EnablePrintRoutes = v
+	return config
+}
+
+func (config *Config) WithColorScheme(v fiber.Colors) *Config {
+	config.ColorScheme = v
+	return config
+}
+
+func (config *Config) WithRequestMethods(v []string) *Config {
+	config.RequestMethods = v
+	return config
+}
+
+func (config *Config) WithEnableSplittingOnParsers(v bool) *Config {
+	config.EnableSplittingOnParsers = v
+	return config
+}
+
+func (config *Config) URL() string {
+	return fmt.Sprintf("%s:%d", config.Host, config.Port)
 }

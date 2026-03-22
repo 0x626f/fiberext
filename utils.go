@@ -1,77 +1,72 @@
 package fiberext
 
 import (
-	"strings"
-
 	"github.com/gofiber/fiber/v2"
 )
 
-func FromParams[T any](c *fiber.Ctx) (*T, error) {
-	obj := new(T)
-	err := c.ParamsParser(obj)
+func FromParams[T any](ctx Context) (T, error) {
+	var obj T
+	err := ctx.ParamsParser(&obj)
 
 	if err != nil {
-		return nil, err
+		return obj, err
 	}
 
 	return obj, nil
 }
 
-func FromBody[T any](c *fiber.Ctx) (*T, error) {
-	obj := new(T)
+func FromBody[T any](ctx Context) (T, error) {
+	var obj T
 
-	if len(c.Body()) <= 0 {
+	if len(ctx.Body()) <= 0 {
 		return obj, nil
 	}
 
-	err := c.BodyParser(obj)
+	err := ctx.BodyParser(&obj)
 
 	if err != nil {
-		return nil, err
+		return obj, err
 	}
 
 	return obj, nil
 }
 
-func FromQuery[T any](c *fiber.Ctx) (*T, error) {
-	obj := new(T)
-	err := c.QueryParser(obj)
+func FromQuery[T any](ctx Context) (T, error) {
+	var obj T
+	err := ctx.QueryParser(&obj)
 
 	if err != nil {
-		return nil, err
+		return obj, err
 	}
 
 	return obj, nil
 }
 
-func RespondBadRequest(c *fiber.Ctx, errors ...string) error {
-	var err error
-	c.Status(fiber.StatusBadRequest)
+func GetParam(ctx Context, key string, def ...string) string {
+	return ctx.Params(key, def...)
+}
 
-	if len(errors) > 0 {
-		err = c.JSON(fiber.Map{
-			"error": strings.Join(errors, "."),
-		})
+func GetQueryArg(ctx Context, key string, def ...string) string {
+	return ctx.Query(key, def...)
+}
+
+func Respond(ctx Context, code int, obj ...any) error {
+	ctx.Status(code)
+
+	if len(obj) > 0 {
+		return ctx.JSON(obj[0])
 	}
-	return err
+
+	return nil
 }
 
-func RespondInternalError(c *fiber.Ctx, errors ...string) error {
-	var err error
-	c.Status(fiber.StatusInternalServerError)
-
-	if len(errors) > 0 {
-		err = c.JSON(fiber.Map{
-			"error": strings.Join(errors, "."),
-		})
+func RespondError(ctx Context, code int, obj ...any) error {
+	ctx.Status(code)
+	if len(obj) > 0 {
+		if err := ctx.JSON(obj[0]); err != nil {
+			return err
+		}
 	}
-	return err
-}
 
-func RespondCreated(c *fiber.Ctx, obj interface{}) error {
-	return c.Status(fiber.StatusCreated).JSON(obj)
-}
-
-func RespondOK(c *fiber.Ctx, obj interface{}) error {
-	return c.Status(fiber.StatusOK).JSON(obj)
+	return fiber.NewError(code)
 }
