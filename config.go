@@ -16,6 +16,8 @@ type Config struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 
+	DisableStartupMessage bool
+
 	TLS            bool `json:"useTls"`
 	MutualTLS      bool
 	CertFile       string
@@ -49,6 +51,11 @@ func (config *Config) WithResource(resource *Resource) *Config {
 // WithMiddleware appends middleware to the global middleware chain.
 func (config *Config) WithMiddleware(middleware Handler) *Config {
 	config.Middlewares = append(config.Middlewares, middleware)
+	return config
+}
+
+func (config *Config) WithDisableStartupMessage(v bool) *Config {
+	config.DisableStartupMessage = v
 	return config
 }
 

@@ -40,7 +40,8 @@ func Run(ctx context.Context, config *Config) Server {
 
 	go func() {
 		listenCfg := fiber.ListenConfig{
-			GracefulContext: ctx,
+			GracefulContext:       ctx,
+			DisableStartupMessage: config.DisableStartupMessage,
 		}
 
 		if config.TLS {
