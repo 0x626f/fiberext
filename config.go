@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	"github.com/gofiber/fiber/v3"
 )
 
 // Config extends fiber.Config with server address, TLS, and routing fields.
@@ -107,12 +106,6 @@ func (config *Config) WithPort(v int) *Config {
 	return config
 }
 
-// WithPrefork enables or disables multi-process prefork mode.
-func (config *Config) WithPrefork(v bool) *Config {
-	config.Prefork = v
-	return config
-}
-
 // WithServerHeader sets the value of the Server response header.
 func (config *Config) WithServerHeader(v string) *Config {
 	config.ServerHeader = v
@@ -140,12 +133,6 @@ func (config *Config) WithImmutable(v bool) *Config {
 // WithUnescapePath unescapes encoded characters in the route path.
 func (config *Config) WithUnescapePath(v bool) *Config {
 	config.UnescapePath = v
-	return config
-}
-
-// WithETag enables ETag header generation.
-func (config *Config) WithETag(v bool) *Config {
-	config.ETag = v
 	return config
 }
 
@@ -209,12 +196,6 @@ func (config *Config) WithWriteBufferSize(v int) *Config {
 	return config
 }
 
-// WithCompressedFileSuffix sets the suffix appended to compressed static files.
-func (config *Config) WithCompressedFileSuffix(v string) *Config {
-	config.CompressedFileSuffix = v
-	return config
-}
-
 // WithProxyHeader sets the header used by c.IP() when behind a proxy.
 func (config *Config) WithProxyHeader(v string) *Config {
 	config.ProxyHeader = v
@@ -257,12 +238,6 @@ func (config *Config) WithDisableHeaderNormalizing(v bool) *Config {
 	return config
 }
 
-// WithDisableStartupMessage suppresses the Fiber ASCII banner on start.
-func (config *Config) WithDisableStartupMessage(v bool) *Config {
-	config.DisableStartupMessage = v
-	return config
-}
-
 // WithAppName sets the application name.
 func (config *Config) WithAppName(v string) *Config {
 	config.AppName = v
@@ -288,50 +263,38 @@ func (config *Config) WithReduceMemoryUsage(v bool) *Config {
 }
 
 // WithJSONEncoder sets a custom JSON marshal function.
-func (config *Config) WithJSONEncoder(v utils.JSONMarshal) *Config {
+func (config *Config) WithJSONEncoder(v func(any) ([]byte, error)) *Config {
 	config.JSONEncoder = v
 	return config
 }
 
 // WithJSONDecoder sets a custom JSON unmarshal function.
-func (config *Config) WithJSONDecoder(v utils.JSONUnmarshal) *Config {
+func (config *Config) WithJSONDecoder(v func([]byte, any) error) *Config {
 	config.JSONDecoder = v
 	return config
 }
 
 // WithXMLEncoder sets a custom XML marshal function.
-func (config *Config) WithXMLEncoder(v utils.XMLMarshal) *Config {
+func (config *Config) WithXMLEncoder(v func(any) ([]byte, error)) *Config {
 	config.XMLEncoder = v
 	return config
 }
 
-// WithNetwork sets the network type ("tcp", "tcp4", "tcp6").
-func (config *Config) WithNetwork(v string) *Config {
-	config.Network = v
-	return config
-}
-
-// WithEnableTrustedProxyCheck enables trusted proxy header validation.
-func (config *Config) WithEnableTrustedProxyCheck(v bool) *Config {
-	config.EnableTrustedProxyCheck = v
+// WithTrustProxy enables trusted proxy header validation.
+func (config *Config) WithTrustProxy(v bool) *Config {
+	config.TrustProxy = v
 	return config
 }
 
 // WithTrustedProxies sets the list of trusted proxy IP addresses.
 func (config *Config) WithTrustedProxies(v []string) *Config {
-	config.TrustedProxies = v
+	config.TrustProxyConfig.Proxies = v
 	return config
 }
 
 // WithEnableIPValidation enables validation of IP addresses returned by c.IP().
 func (config *Config) WithEnableIPValidation(v bool) *Config {
 	config.EnableIPValidation = v
-	return config
-}
-
-// WithEnablePrintRoutes prints all registered routes on startup.
-func (config *Config) WithEnablePrintRoutes(v bool) *Config {
-	config.EnablePrintRoutes = v
 	return config
 }
 

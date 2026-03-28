@@ -1,13 +1,13 @@
 package fiberext
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-// FromParams parses URL parameters into T using the "params" struct tag.
+// FromParams parses URL parameters into T using the "uri" struct tag.
 func FromParams[T any](ctx Context) (T, error) {
 	var obj T
-	err := ctx.ParamsParser(&obj)
+	err := ctx.Bind().URI(&obj)
 
 	if err != nil {
 		return obj, err
@@ -16,15 +16,15 @@ func FromParams[T any](ctx Context) (T, error) {
 	return obj, nil
 }
 
-// FromBody decodes the JSON request body into T.
+// FromBody decodes the request body into T based on Content-Type.
 func FromBody[T any](ctx Context) (T, error) {
 	var obj T
 
-	if len(ctx.Body()) <= 0 {
+	if !ctx.HasBody() {
 		return obj, nil
 	}
 
-	err := ctx.BodyParser(&obj)
+	err := ctx.Bind().Body(&obj)
 
 	if err != nil {
 		return obj, err
@@ -36,7 +36,7 @@ func FromBody[T any](ctx Context) (T, error) {
 // FromQuery parses query string parameters into T using the "query" struct tag.
 func FromQuery[T any](ctx Context) (T, error) {
 	var obj T
-	err := ctx.QueryParser(&obj)
+	err := ctx.Bind().Query(&obj)
 
 	if err != nil {
 		return obj, err

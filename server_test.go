@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/0x626f/fiberext"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // ---- domain types ----
@@ -113,7 +113,7 @@ func assertHeader(t *testing.T, resp *http.Response, key, want string) {
 
 func do(t *testing.T, srv fiberext.Server, req *http.Request) *http.Response {
 	t.Helper()
-	resp, err := srv.Test(req, -1)
+	resp, err := srv.Test(req, fiber.TestConfig{Timeout: 0})
 	if err != nil {
 		t.Fatalf("srv.Test: %v", err)
 	}
@@ -151,7 +151,7 @@ func TestServer_Resources_CRUD(t *testing.T) {
 		})).
 		WithResource(fiberext.NewResource(http.MethodGet, "/users/:id", func(c fiberext.Context) error {
 			type p struct {
-				ID int `params:"id"`
+				ID int `uri:"id"`
 			}
 			params, _ := fiberext.FromParams[p](c)
 			u, ok := store[params.ID]
@@ -162,7 +162,7 @@ func TestServer_Resources_CRUD(t *testing.T) {
 		})).
 		WithResource(fiberext.NewResource(http.MethodPut, "/users/:id", func(c fiberext.Context) error {
 			type p struct {
-				ID int `params:"id"`
+				ID int `uri:"id"`
 			}
 			params, _ := fiberext.FromParams[p](c)
 			if _, ok := store[params.ID]; !ok {
@@ -178,7 +178,7 @@ func TestServer_Resources_CRUD(t *testing.T) {
 		})).
 		WithResource(fiberext.NewResource(http.MethodDelete, "/users/:id", func(c fiberext.Context) error {
 			type p struct {
-				ID int `params:"id"`
+				ID int `uri:"id"`
 			}
 			params, _ := fiberext.FromParams[p](c)
 			delete(store, params.ID)
@@ -283,7 +283,7 @@ func TestServer_Controller_GroupedRoutes(t *testing.T) {
 	}))
 	ctrl.AddResource(fiberext.NewResource(http.MethodGet, "/products/:id", func(c fiberext.Context) error {
 		type params struct {
-			ID int `params:"id"`
+			ID int `uri:"id"`
 		}
 		ps, _ := fiberext.FromParams[params](c)
 		p, ok := products[ps.ID]
@@ -294,7 +294,7 @@ func TestServer_Controller_GroupedRoutes(t *testing.T) {
 	}))
 	ctrl.AddResource(fiberext.NewResource(http.MethodDelete, "/products/:id", func(c fiberext.Context) error {
 		type params struct {
-			ID int `params:"id"`
+			ID int `uri:"id"`
 		}
 		ps, _ := fiberext.FromParams[params](c)
 		delete(products, ps.ID)

@@ -1,9 +1,12 @@
-// Package fiberext provides a thin opinionated wrapper around fiber/v2,
+// Package fiberext provides a thin opinionated wrapper around fiber/v3,
 // offering builder-style configuration, typed request helpers, and HTTP status
 // response helpers.
 package fiberext
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/static"
+)
 
 // Server is an alias for *fiber.App.
 type Server = *fiber.App
@@ -14,8 +17,8 @@ type Handler = fiber.Handler
 // ErrorHandler is an alias for fiber.ErrorHandler.
 type ErrorHandler = fiber.ErrorHandler
 
-// Context is an alias for *fiber.Ctx.
-type Context = *fiber.Ctx
+// Context is an alias for fiber.Ctx.
+type Context = fiber.Ctx
 
 // Controller groups Resources under a common path prefix.
 type Controller struct {
@@ -51,7 +54,7 @@ type Resource struct {
 	Static       bool
 	WebPath      string
 	FilePath     string
-	StaticConfig fiber.Static
+	StaticConfig static.Config
 }
 
 // NewResource returns a Resource for the given HTTP method, path and handler.
