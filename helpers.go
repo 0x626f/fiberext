@@ -26,22 +26,22 @@ func EarlyHints(ctx Context) error {
 
 // OK responds with 200 OK and serializes obj as JSON.
 func OK(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusOK, obj)
+	return Respond(ctx, fiber.StatusOK, obj...)
 }
 
 // Created responds with 201 Created and serializes obj as JSON.
 func Created(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusCreated, obj)
+	return Respond(ctx, fiber.StatusCreated, obj...)
 }
 
 // Accepted responds with 202 Accepted and serializes obj as JSON.
 func Accepted(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusAccepted, obj)
+	return Respond(ctx, fiber.StatusAccepted, obj...)
 }
 
 // NonAuthoritativeInformation responds with 203 and serializes obj as JSON.
 func NonAuthoritativeInformation(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusNonAuthoritativeInformation, obj)
+	return Respond(ctx, fiber.StatusNonAuthoritativeInformation, obj...)
 }
 
 // NoContent responds with 204 No Content.
@@ -56,27 +56,27 @@ func ResetContent(ctx Context) error {
 
 // PartialContent responds with 206 Partial Content and serializes obj as JSON.
 func PartialContent(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusPartialContent, obj)
+	return Respond(ctx, fiber.StatusPartialContent, obj...)
 }
 
 // MultiStatus responds with 207 Multi-Status and serializes obj as JSON.
 func MultiStatus(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusMultiStatus, obj)
+	return Respond(ctx, fiber.StatusMultiStatus, obj...)
 }
 
 // AlreadyReported responds with 208 Already Reported and serializes obj as JSON.
 func AlreadyReported(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusAlreadyReported, obj)
+	return Respond(ctx, fiber.StatusAlreadyReported, obj...)
 }
 
 // IMUsed responds with 226 IM Used and serializes obj as JSON.
 func IMUsed(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusIMUsed, obj)
+	return Respond(ctx, fiber.StatusIMUsed, obj...)
 }
 
 // MultipleChoices responds with 300 Multiple Choices and serializes obj as JSON.
 func MultipleChoices(ctx Context, obj ...any) error {
-	return Respond(ctx, fiber.StatusMultipleChoices, obj)
+	return Respond(ctx, fiber.StatusMultipleChoices, obj...)
 }
 
 // MovedPermanently responds with 301 Moved Permanently.
